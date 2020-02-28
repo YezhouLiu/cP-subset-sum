@@ -1,0 +1,114 @@
+﻿////////////////The cP solution to the subset sum problem//////////////////
+//Yezhou Liu
+
+#define s0reached state == 0;
+#define s1reached state == 1;
+#define s2reached state == 2;
+#define s3reached state == 3;
+
+//#define N 12;
+//var m = [1,2,3,4,15,37,55,56,57,119,235,244];
+//#define goal p_s == 665;
+
+//#define N 10;
+//var m = [1,2,3,4,55,56,57,119,235,244];
+//#define goal p_s == 664;
+
+
+//#define N 8;
+//var m = [1,2,4,37,55,56,57,119];
+//#define goal p_s == 291;
+
+//#define N 7;
+//var m = [1,2,4,55,56,57,119];
+//#define goal p_s == 291;
+
+#define N 4;
+var m = [1,2,3,4];
+var t = 10;
+#define goal p_s == t;
+
+var p_u[N];
+var p_n[N];
+var out[N];
+
+var lambda = [-1,-1,-1,-1];
+
+var p_s;
+var p_u_last;
+var p_n_size;
+var state = 0;
+
+S0() = rule1{
+	if (state == 0){
+		p_u = lambda;
+		p_u_last = 0;
+		p_n = m;
+		p_n_size = N;
+		p_s = 0;
+		state = 1;
+		}
+	}-> S1_1();
+	
+S1_1() = rule2{if(state == 1 && p_s == t){state = 2;}} 
+		-> rule3{if(!goal && state == 1 && p_n_size == 0){state = 3;}} 
+		-> if(state == 2){S2()} else if(state == 3){S3()} else if(p_u_last >= N){Skip} else if(state == 1){S1_2()} else {Skip};
+
+S1_2() = []i:{0..(N-1)}@ rule4{
+	state = 1;
+	if(p_n[i] != 0)
+		{
+		p_u[p_u_last] = p_n[i];
+		p_n[i] = 0;
+		p_s = p_s + p_u[p_u_last];
+		p_u_last++;
+		p_n_size--;
+	}
+	} -> S1_1();
+
+S2() = rule2{out=p_u;} -> Skip;
+S3() = rule3{out=lambda;} -> Skip;
+
+//#assert S0() reaches s0reached;
+//#assert S0() reaches s1reached;
+
+#assert S0() nonterminating;
+#assert S0() deadlockfree;
+#assert S0() divergencefree;
+#assert S0() deterministic;
+#assert S0() reaches goal;
+//#assert S0() reaches s2reached;
+//#assert S1_2() |= F X s1reached;
+
+/*
+#assert S1_2() |= F X s2reached;
+#assert S2() |= F s2reached;
+
+#assert S0() |= F (s1reached U s1reached);
+#assert S0() |= F (s1reached U s2reached);
+
+#assert S0() |= G<> rule1;
+#assert S0() |= G<> rule2;
+#assert S0() |= G<> rule3;
+
+#assert S0() |= F rule1;
+#assert S0() |= F rule2;
+#assert S0() |= F rule3;
+
+#assert S1_1() |= F X s1reached;
+#assert S1_1() |= G X s2reached;
+
+#assert S0() |= F s1reached;
+
+#assert S0() |= G s1reached;
+#assert S0() |= G s2reached;
+
+#assert S1_1() |= F (s1reached U s2reached);
+#assert S0() |= G (s1reached U s2reached);
+
+#assert S1_1() |= F G s1reached;
+#assert S2() |= F G s2reached;
+
+*/
+
+
